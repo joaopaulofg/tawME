@@ -27,4 +27,8 @@ public class User {
     @NonNull
     private String phoneNumber;
 
+    @Column(name="PASSWORD")
+    @NonNull
+    private String password;
+
 }
