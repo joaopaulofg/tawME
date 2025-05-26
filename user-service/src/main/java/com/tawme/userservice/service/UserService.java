@@ -34,16 +34,22 @@ public class UserService {
     }
 
     public String login(String phoneNumber, String password) {
-        try {
-            var usernamePassword = new UsernamePasswordAuthenticationToken(phoneNumber, password);
-            var auth = authenticationManager.authenticate(usernamePassword);
+        var user = userRepository.findByPhoneNumber(phoneNumber);
 
-            var user = (User) auth.getPrincipal();
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        } else {
+            try {
+                var usernamePassword = new UsernamePasswordAuthenticationToken(phoneNumber, password);
+                var auth = authenticationManager.authenticate(usernamePassword);
 
-            return tokenService.generateToken(user.getId(), user.getPhoneNumber());
+                var userFound  = (User) auth.getPrincipal();
 
-        } catch (RuntimeException e) {
-            return "Falha na autenticação: " + e.getMessage();
+                return tokenService.generateToken(userFound.getId(), userFound.getPhoneNumber());
+
+            } catch (RuntimeException e) {
+                return "Falha na autenticação: " + e.getMessage();
+            }
         }
     }
 

@@ -24,8 +24,8 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(secret.getBytes(StandardCharsets.UTF_8));
             return JWT.create()
                     .withIssuer("user-service")
-                    .withSubject(userId.toString())
-                    .withClaim("phoneNumber", phoneNumber)
+                    .withSubject(phoneNumber)
+                    .withClaim("userId", userId.toString())
                     .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {

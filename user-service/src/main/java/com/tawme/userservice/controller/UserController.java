@@ -4,16 +4,16 @@ import com.tawme.userservice.dto.LoginRequest;
 import com.tawme.userservice.dto.LoginResponseDTO;
 import com.tawme.userservice.dto.UserRequest;
 import com.tawme.userservice.dto.UserResponse;
+import com.tawme.userservice.entity.User;
 import com.tawme.userservice.mapper.UserMapper;
 import com.tawme.userservice.repository.UserRepository;
 import com.tawme.userservice.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -36,11 +36,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest body) {
-        var user = repository.findByPhoneNumber(body.phoneNumber())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        String token = userService.login(user.getPhoneNumber(), body.password());
+        String token = userService.login(body.phoneNumber(), body.password());
         return ResponseEntity.ok(new LoginResponseDTO(token));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<User> me(@AuthenticationPrincipal UserDetails userDetails) {
+        var user = (User) userDetails;
+        return ResponseEntity.ok(user);
     }
 
 }
