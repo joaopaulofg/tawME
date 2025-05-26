@@ -5,6 +5,7 @@ import com.tawme.userservice.dto.UserResponse;
 import com.tawme.userservice.entity.User;
 import com.tawme.userservice.mapper.UserMapper;
 import com.tawme.userservice.repository.UserRepository;
+import com.tawme.userservice.security.TokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,8 @@ public class UserService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final TokenService tokenService;
+
     public UserResponse createUser(UserRequest userRequest) {
         User newUser = UserMapper.INSTANCE.convertUserRequestToUser(userRequest);
         String ecryptedPassword = passwordEncoder.encode(newUser.getPassword());
@@ -36,7 +39,8 @@ public class UserService {
             var auth = authenticationManager.authenticate(usernamePassword);
 
             var user = (User) auth.getPrincipal();
-            return "Login bem-sucedido para: " + user.getUsername();
+
+            return tokenService.generateToken(user.getId(), user.getPhoneNumber());
 
         } catch (RuntimeException e) {
             return "Falha na autenticação: " + e.getMessage();
