@@ -1,5 +1,6 @@
 package com.tawme.userservice.controller;
 
+import com.tawme.userservice.dto.LoginRequest;
 import com.tawme.userservice.dto.UserRequest;
 import com.tawme.userservice.dto.UserResponse;
 import com.tawme.userservice.service.UserService;
@@ -24,8 +25,13 @@ public class UserController {
         if (newUser == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } else {
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+            return new ResponseEntity<>(newUser,  HttpStatus.CREATED);
         }
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest loginRequest) {
+        return userService.login(loginRequest.phoneNumber(), loginRequest.password());
     }
 
 }

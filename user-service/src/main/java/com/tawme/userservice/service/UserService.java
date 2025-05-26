@@ -6,6 +6,8 @@ import com.tawme.userservice.entity.User;
 import com.tawme.userservice.mapper.UserMapper;
 import com.tawme.userservice.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,13 +20,29 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final AuthenticationManager authenticationManager;
+
     public UserResponse createUser(UserRequest userRequest) {
-        if (this.userRepository.findByPhoneNumber(userRequest.phoneNumber()) != null) return null;
         User newUser = UserMapper.INSTANCE.convertUserRequestToUser(userRequest);
         String ecryptedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(ecryptedPassword);
         userRepository.save(newUser);
         return UserMapper.INSTANCE.convertUserToUserResponse(newUser);
     }
+
+    public String login(String phoneNumber, String password) {
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(phoneNumber, password);
+            var auth = authenticationManager.authenticate(usernamePassword);
+
+            var user = (User) auth.getPrincipal();
+            return "Login bem-sucedido para: " + user.getUsername();
+
+        } catch (RuntimeException e) {
+            return "Falha na autenticação: " + e.getMessage();
+        }
+    }
+
+
 
 }
