@@ -5,8 +5,6 @@ import com.tawme.userservice.dto.LoginResponseDTO;
 import com.tawme.userservice.dto.UserRequest;
 import com.tawme.userservice.dto.UserResponse;
 import com.tawme.userservice.entity.User;
-import com.tawme.userservice.mapper.UserMapper;
-import com.tawme.userservice.repository.UserRepository;
 import com.tawme.userservice.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-
-    private final UserRepository repository;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest userRequest) {
