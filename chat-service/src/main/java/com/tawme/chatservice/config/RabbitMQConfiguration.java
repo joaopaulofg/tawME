@@ -19,25 +19,25 @@ public class RabbitMQConfiguration {
     @Value("${rabbitmq.novousuario.queue}")
     private String queueNovoUsuario;
 
-//    @Bean
-//    public Queue criarFilaNovoUsuarioMsChat() {
-//        return QueueBuilder.durable(queueNovoUsuario).build();
-//    }
+    @Bean
+    public Queue criarFilaNovoUsuarioMsChat() {
+        return QueueBuilder.durable(queueNovoUsuario).build();
+    }
 
     @Bean
     public RabbitAdmin criarRabbitAdmin(ConnectionFactory connectionFactory) {
         return new RabbitAdmin(connectionFactory);
     }
 
-//    @Bean
-//    public FanoutExchange criarFanoutNovoUsuario() {
-//        return ExchangeBuilder.fanoutExchange(exchangeNovoUsuario).build();
-//    }
-//
-//    @Bean
-//    public Binding criarBindingNovoUsuarioMsNotificacao() {
-//        return BindingBuilder.bind(criarFilaNovoUsuarioMsChat()).to(criarFanoutNovoUsuario());
-//    }
+    @Bean
+    public FanoutExchange criarFanoutNovoUsuario() {
+        return ExchangeBuilder.fanoutExchange(exchangeNovoUsuario).build();
+    }
+
+    @Bean
+    public Binding criarBindingNovoUsuarioMsNotificacao() {
+        return BindingBuilder.bind(criarFilaNovoUsuarioMsChat()).to(criarFanoutNovoUsuario());
+    }
 
     @Bean
     public RabbitTemplate criarRabbitTemplate(ConnectionFactory connectionFactory) {
@@ -47,6 +47,7 @@ public class RabbitMQConfiguration {
         return rabbitTemplate;
     }
 
+    @Bean
     public MessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
