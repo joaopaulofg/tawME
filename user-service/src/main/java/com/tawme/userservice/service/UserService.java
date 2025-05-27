@@ -2,18 +2,19 @@ package com.tawme.userservice.service;
 
 import com.tawme.userservice.dto.UserRequest;
 import com.tawme.userservice.dto.UserResponse;
+import com.tawme.userservice.dto.UsuarioCadastradoEvent;
 import com.tawme.userservice.entity.User;
 import com.tawme.userservice.mapper.UserMapper;
 import com.tawme.userservice.repository.UserRepository;
 import com.tawme.userservice.security.TokenService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
@@ -24,11 +25,35 @@ public class UserService {
 
     private final TokenService tokenService;
 
+    private final NotificacaoRabbitService notificacaoRabbitService;
+
+    private final String exchangeNovoUsuario;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,
+                       TokenService tokenService, NotificacaoRabbitService notificacaoRabbitService, @Value("${rabbitmq.novousuario.exchange}") String exchangeNovoUsuario) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+        this.notificacaoRabbitService = notificacaoRabbitService;
+        this.exchangeNovoUsuario = exchangeNovoUsuario;
+
+    }
+
     public UserResponse createUser(UserRequest userRequest) {
         User newUser = UserMapper.INSTANCE.convertUserRequestToUser(userRequest);
         String ecryptedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(ecryptedPassword);
         userRepository.save(newUser);
+
+        var evento = new UsuarioCadastradoEvent(
+                newUser.getId(),
+                newUser.getName(),
+                newUser.getPhoneNumber()
+        );
+
+        notificarRabbitMQ(evento);
+
         return UserMapper.INSTANCE.convertUserToUserResponse(newUser);
     }
 
@@ -52,6 +77,11 @@ public class UserService {
         }
     }
 
-
-
+    private void notificarRabbitMQ(UsuarioCadastradoEvent user) {
+        try{
+            notificacaoRabbitService.notificar(user, exchangeNovoUsuario);
+        }catch (RuntimeException e){
+            System.out.println("Erro ao notificar");
+        }
+    }
 }
