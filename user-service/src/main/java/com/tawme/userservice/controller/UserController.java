@@ -1,7 +1,7 @@
 package com.tawme.userservice.controller;
 
 import com.tawme.userservice.dto.LoginRequest;
-import com.tawme.userservice.dto.LoginResponseDTO;
+import com.tawme.userservice.dto.LoginResponse;
 import com.tawme.userservice.dto.UserRequest;
 import com.tawme.userservice.dto.UserResponse;
 import com.tawme.userservice.entity.User;
@@ -31,9 +31,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest body) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest body) {
         String token = userService.login(body.phoneNumber(), body.password());
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 
     @GetMapping("/me")

@@ -1,6 +1,6 @@
 package com.tawme.userservice.dto;
 
-public record LoginResponseDTO(
+public record LoginResponse(
         String token
 ) {
 }
