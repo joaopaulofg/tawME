@@ -4,24 +4,21 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class User {
+public class UsersChats {
 
     @Id
-    @Column(name="ID")
+    @GeneratedValue(strategy= GenerationType.UUID)
     private UUID id;
 
-    @Column(name="NAME")
-    @NonNull
-    private String name;
+    @Column(nullable = false)
+    private UUID userID;
 
-    @Column(name="PHONE")
-    @NonNull
-    private String phoneNumber;
+    @Column(nullable = false)
+    private UUID chatID;
 }
