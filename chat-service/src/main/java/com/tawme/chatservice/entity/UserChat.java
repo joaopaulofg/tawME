@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class UsersChats {
+public class UserChat {
 
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
