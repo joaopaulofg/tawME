@@ -8,5 +8,7 @@ import java.util.UUID;
 
 public interface UserChatRepository extends JpaRepository<UserChat, UUID> {
 
+    boolean existsByUserIdAndChatId(UUID userID, UUID chatID);
+
     List<UserChat> findByUserID(UUID userID);
 }
